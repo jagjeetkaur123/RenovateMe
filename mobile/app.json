@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "SilverBricks Connect",
+    "slug": "silverbricks-connect",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1e3a8a"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.au.silverbricksconnect",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "We use your location to find nearby tradespeople.",
+        "NSCameraUsageDescription": "We need camera access to upload job photos.",
+        "NSPhotoLibraryUsageDescription": "We need photo library access to upload job photos."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1e3a8a"
+      },
+      "package": "com.au.silverbricksconnect",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-location",
+      "expo-image-picker",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#1e3a8a"
+        }
+      ]
+    ],
+    "scheme": "silverbricks"
+  }
+}
