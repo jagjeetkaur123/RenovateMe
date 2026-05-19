@@ -9,7 +9,6 @@ from app.schemas.user import UserRegister, UserLogin, TokenResponse, UserOut, Us
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def register(payload: UserRegister, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == payload.email))
@@ -25,22 +24,33 @@ async def register(payload: UserRegister, db: AsyncSession = Depends(get_db)):
     )
     db.add(user)
     await db.flush()
+    await db.commit() 
     await db.refresh(user)
 
     return TokenResponse(
         access_token=create_access_token(user.id),
         refresh_token=create_refresh_token(user.id),
+        token_type="bearer", 
         user=UserOut.model_validate(user),
     )
-
 
 @router.post("/login", response_model=TokenResponse)
 async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalar_one_or_none()
 
-    if not user or not user.hashed_password or not verify_password(payload.password, user.hashed_password):
+    # --- CHANGE KIYA: User existence check karne ke liye ---
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="User not found! First you will need to signup, please."
+        )
+    # -------------------------------------------------------
+
+    # --- CHANGE KIYA: Ab sirf password check hoga ---
+    if not user.hashed_password or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    # -------------------------------------------------------
 
     if not user.is_active:
         raise HTTPException(status_code=403, detail="Account is deactivated")
@@ -48,9 +58,9 @@ async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
     return TokenResponse(
         access_token=create_access_token(user.id),
         refresh_token=create_refresh_token(user.id),
+        token_type="bearer", 
         user=UserOut.model_validate(user),
     )
-
 
 @router.post("/refresh", response_model=TokenResponse)
 async def refresh_token(refresh_token: str, db: AsyncSession = Depends(get_db)):
@@ -66,14 +76,13 @@ async def refresh_token(refresh_token: str, db: AsyncSession = Depends(get_db)):
     return TokenResponse(
         access_token=create_access_token(user.id),
         refresh_token=create_refresh_token(user.id),
+        token_type="bearer", 
         user=UserOut.model_validate(user),
     )
-
 
 @router.get("/me", response_model=UserOut)
 async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
-
 
 @router.patch("/me", response_model=UserOut)
 async def update_me(
@@ -84,9 +93,9 @@ async def update_me(
     for field, value in payload.model_dump(exclude_none=True).items():
         setattr(current_user, field, value)
     await db.flush()
+    await db.commit()
     await db.refresh(current_user)
     return current_user
-
 
 @router.post("/me/change-password", status_code=204)
 async def change_password(
@@ -98,3 +107,4 @@ async def change_password(
         raise HTTPException(status_code=400, detail="Current password is incorrect")
     current_user.hashed_password = hash_password(payload.new_password)
     await db.flush()
+    await db.commit()

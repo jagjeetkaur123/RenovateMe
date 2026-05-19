@@ -1,12 +1,22 @@
+import ssl  # <--- Ye raha tumhara SSL import
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import DeclarativeBase
 from app.core.config import settings
 
+# SSL verification bypass karne ke liye context create kar rahe hain
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
 
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
     pool_pre_ping=True,
+    connect_args={
+        "prepared_statement_cache_size": 0,
+        "statement_cache_size": 0,
+        "ssl": ssl_context  # <--- Context use karo bypass ke liye
+    }
 )
 
 AsyncSessionLocal = async_sessionmaker(
@@ -15,12 +25,10 @@ AsyncSessionLocal = async_sessionmaker(
     expire_on_commit=False,
 )
 
-
 class Base(DeclarativeBase):
     pass
 
-
-async def get_db() -> AsyncSession:
+async def get_db():
     async with AsyncSessionLocal() as session:
         try:
             yield session

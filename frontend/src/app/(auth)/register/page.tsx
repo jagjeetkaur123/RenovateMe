@@ -7,12 +7,6 @@ import { register } from "@/lib/auth";
 
 type Role = "customer" | "tradesperson" | "business_owner";
 
-const roles: { value: Role; label: string; desc: string }[] = [
-  { value: "customer", label: "Customer / Homeowner", desc: "I want to find and book services" },
-  { value: "tradesperson", label: "Tradesperson", desc: "I offer trade services" },
-  { value: "business_owner", label: "Business Owner", desc: "I run a salon, clinic or local business" },
-];
-
 export default function RegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -48,7 +42,7 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
-      <div className="w-full max-w-lg">
+      <div className="w-full max-w-xl"> {/* Width thodi badha di cards ke liye */}
         <div className="mb-8 text-center">
           <Link href="/" className="text-2xl font-bold text-brand-600">
             SilverBricks Connect
@@ -56,44 +50,95 @@ export default function RegisterPage() {
           <h1 className="mt-4 text-2xl font-bold text-gray-900">Create your account</h1>
         </div>
 
-        <div className="card space-y-6">
-          {/* Role selector */}
+        <div className="card space-y-8">
+          {/* --- Professional Role Selection Cards Start --- */}
           <div>
-            <p className="label">I am a...</p>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {roles.map((r) => (
-                <button
-                  key={r.value}
-                  type="button"
-                  onClick={() => setRole(r.value)}
-                  className={`rounded-lg border p-3 text-left text-sm transition ${
-                    role === r.value
-                      ? "border-brand-500 bg-blue-50 text-brand-700"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <div className="font-medium">{r.label}</div>
-                  <div className="mt-0.5 text-xs text-gray-500">{r.desc}</div>
-                </button>
-              ))}
-            </div>
-          </div>
+            <p className="label mb-4 text-center">I want to...</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {/* Card 1: Customer */}
+              <button
+                type="button"
+                onClick={() => setRole("customer")}
+                className={`flex flex-col items-center rounded-xl border-2 p-6 text-center transition ${
+                  role === "customer"
+                    ? "border-brand-500 bg-blue-50 ring-2 ring-brand-500/20"
+                    : "border-gray-100 hover:border-gray-200"
+                }`}
+              >
+                <span className="text-4xl mb-3">🏡</span>
+                <div className="font-bold text-gray-900">Get a Service</div>
+                <div className="mt-1 text-xs text-gray-500">I want to find and book tradies</div>
+              </button>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Card 2: Partner */}
+              <button
+                type="button"
+                onClick={() => setRole("tradesperson")} 
+                className={`flex flex-col items-center rounded-xl border-2 p-6 text-center transition ${
+                  role !== "customer"
+                    ? "border-brand-500 bg-blue-50 ring-2 ring-brand-500/20"
+                    : "border-gray-100 hover:border-gray-200"
+                }`}
+              >
+                <span className="text-4xl mb-3">🛠️</span>
+                <div className="font-bold text-gray-900">Become a Partner</div>
+                <div className="mt-1 text-xs text-gray-500">I want to grow my business</div>
+              </button>
+            </div>
+
+            {/* Sub-role selector (Only if Partner is selected) */}
+            {role !== "customer" && (
+              <div className="mt-6 flex justify-center gap-6 rounded-lg bg-gray-50 p-3">
+                <label className="flex items-center gap-2 text-sm font-medium cursor-pointer text-gray-700">
+                  <input 
+                    type="radio" 
+                    checked={role === "tradesperson"} 
+                    onChange={() => setRole("tradesperson")}
+                    className="h-4 w-4 text-brand-600 focus:ring-brand-500"
+                  />
+                  Individual Tradie
+                </label>
+                <label className="flex items-center gap-2 text-sm font-medium cursor-pointer text-gray-700">
+                  <input 
+                    type="radio" 
+                    checked={role === "business_owner"} 
+                    onChange={() => setRole("business_owner")}
+                    className="h-4 w-4 text-brand-600 focus:ring-brand-500"
+                  />
+                  Agency / Business
+                </label>
+              </div>
+            )}
+          </div>
+          {/* --- Professional Role Selection Cards End --- */}
+
+          <form onSubmit={handleSubmit} className="space-y-4 pt-4 border-t border-gray-100">
             {error && (
               <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
             )}
 
-            <div>
-              <label className="label">Full name</label>
-              <input
-                type="text"
-                className="input"
-                placeholder="Jane Smith"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="label">Full name</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Jane Smith"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="label">Phone number</label>
+                <input
+                  type="tel"
+                  className="input"
+                  placeholder="04xx xxx xxx"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
             </div>
 
             <div>
@@ -105,17 +150,6 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-              />
-            </div>
-
-            <div>
-              <label className="label">Phone number (optional)</label>
-              <input
-                type="tel"
-                className="input"
-                placeholder="04xx xxx xxx"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
               />
             </div>
 
@@ -132,8 +166,8 @@ export default function RegisterPage() {
               />
             </div>
 
-            <button type="submit" className="btn-primary w-full py-3" disabled={loading}>
-              {loading ? "Creating account..." : "Create account"}
+            <button type="submit" className="btn-primary w-full py-3 mt-4" disabled={loading}>
+              {loading ? "Creating account..." : `Register as ${role.replace('_', ' ')}`}
             </button>
 
             <p className="text-center text-xs text-gray-500">

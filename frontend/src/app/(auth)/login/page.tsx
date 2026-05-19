@@ -18,6 +18,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const data = await login(email, password);
+      
       // Redirect based on role
       const roleRedirects: Record<string, string> = {
         customer: "/dashboard/customer",
@@ -26,8 +27,19 @@ export default function LoginPage() {
         admin: "/admin",
       };
       router.push(roleRedirects[data.user.role] ?? "/");
-    } catch {
-      setError("Invalid email or password. Please try again.");
+    } catch (err: any) {
+      // --- CHANGE KIYA: Backend message handle karne ke liye ---
+      if (err.response?.status === 404) {
+        // Jab user database mein nahi milta
+        setError("User not found! First you will need to signup, please.");
+      } else if (err.response?.status === 401) {
+        // Jab password galat hota hai
+        setError("Invalid email or password. Please try again.");
+      } else {
+        // Koi aur error (Server down etc.)
+        setError("Something went wrong. Please try again later.");
+      }
+      // -------------------------------------------------------
     } finally {
       setLoading(false);
     }
@@ -47,7 +59,9 @@ export default function LoginPage() {
         <div className="card">
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 font-medium">
+                {error}
+              </div>
             )}
 
             <div>
@@ -83,7 +97,7 @@ export default function LoginPage() {
             </div>
 
             <button type="submit" className="btn-primary w-full py-3" disabled={loading}>
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? "Signing in..." : "Log in"}
             </button>
           </form>
 

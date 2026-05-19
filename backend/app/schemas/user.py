@@ -1,62 +1,49 @@
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, ConfigDict
+from typing import Optional, List
 from datetime import datetime
-from app.models.user import UserRole
+from enum import Enum
 
+class UserRole(str, Enum):
+    customer = "customer"
+    tradesperson = "tradesperson"
+    business_owner = "business_owner"
+    admin = "admin"
 
+# Ye wo names hain jo auth.py dhoond raha hai
 class UserRegister(BaseModel):
     name: str
     email: EmailStr
     password: str
-    phone: str | None = None
-    role: UserRole = UserRole.CUSTOMER
-
-    @field_validator("password")
-    @classmethod
-    def password_strength(cls, v: str) -> str:
-        if len(v) < 8:
-            raise ValueError("Password must be at least 8 characters")
-        return v
-
+    phone: Optional[str] = None
+    role: UserRole = UserRole.customer
 
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str
+    user: "UserOut"
 
 class UserOut(BaseModel):
     id: int
     name: str
     email: str
-    phone: str | None
     role: UserRole
     is_active: bool
     is_verified: bool
-    avatar_url: str | None
+    phone: Optional[str] = None
     created_at: datetime
 
-    model_config = {"from_attributes": True}
-
-
-class TokenResponse(BaseModel):
-    access_token: str
-    refresh_token: str
-    token_type: str = "bearer"
-    user: UserOut
-
+    model_config = ConfigDict(from_attributes=True)
 
 class UserUpdate(BaseModel):
-    name: str | None = None
-    phone: str | None = None
-    avatar_url: str | None = None
-
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    avatar_url: Optional[str] = None
 
 class PasswordChange(BaseModel):
-    current_password: str
+    old_password: str
     new_password: str
-
-    @field_validator("new_password")
-    @classmethod
-    def password_strength(cls, v: str) -> str:
-        if len(v) < 8:
-            raise ValueError("Password must be at least 8 characters")
-        return v

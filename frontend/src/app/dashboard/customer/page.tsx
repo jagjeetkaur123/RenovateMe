@@ -12,7 +12,6 @@ const quickActions = [
 export default function CustomerDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="border-b border-gray-200 bg-white px-4 py-4">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <Link href="/" className="text-xl font-bold text-brand-600">SilverBricks Connect</Link>
@@ -28,7 +27,6 @@ export default function CustomerDashboard() {
         <h1 className="mb-2 text-2xl font-bold text-gray-900">Good day! 👋</h1>
         <p className="mb-8 text-gray-500">What can we help you with today?</p>
 
-        {/* Quick actions */}
         <section className="mb-10">
           <h2 className="mb-4 text-lg font-semibold text-gray-800">Quick Actions</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -43,7 +41,6 @@ export default function CustomerDashboard() {
           </div>
         </section>
 
-        {/* Recent activity placeholder */}
         <section>
           <h2 className="mb-4 text-lg font-semibold text-gray-800">Recent Activity</h2>
           <div className="card text-center py-12 text-gray-400">

@@ -16,6 +16,8 @@ import app.models  # noqa: F401
 async def lifespan(app: FastAPI):
     # Create upload directory
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
     yield
 
 
