@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import auth, jobs, quotes, bookings, reviews, tradespeople, businesses, admin
+from app.api.v1 import auth, jobs, quotes, bookings, reviews, tradespeople, businesses, admin, notifications, uploads
 
 api_router = APIRouter()
 
@@ -11,3 +11,5 @@ api_router.include_router(reviews.router)
 api_router.include_router(tradespeople.router)
 api_router.include_router(businesses.router)
 api_router.include_router(admin.router)
+api_router.include_router(notifications.router)
+api_router.include_router(uploads.router)

@@ -1,6 +1,11 @@
+import logging
 from pydantic_settings import BaseSettings
-from pydantic import AnyHttpUrl
+from pydantic import AnyHttpUrl, field_validator
 from typing import List
+
+logger = logging.getLogger(__name__)
+
+_DEFAULT_SECRET = "dev-secret-key-change-in-production-min-32-chars"
 
 
 class Settings(BaseSettings):
@@ -11,7 +16,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # Security
-    SECRET_KEY: str = "dev-secret-key-change-in-production-min-32-chars"
+    SECRET_KEY: str = _DEFAULT_SECRET
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
@@ -35,6 +40,28 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     EMAILS_FROM_EMAIL: str = "noreply@silverbricksconnect.com.au"
     EMAILS_FROM_NAME: str = "SilverBricks Connect"
+
+    # Google OAuth
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+
+    # Firebase
+    FIREBASE_CREDENTIALS_PATH: str = "./firebase-credentials.json"
+
+    # Stripe
+    STRIPE_SECRET_KEY: str = ""
+    STRIPE_WEBHOOK_SECRET: str = ""
+
+    @field_validator("SECRET_KEY")
+    @classmethod
+    def warn_default_secret(cls, v: str) -> str:
+        if v == _DEFAULT_SECRET:
+            logger.warning(
+                "WARNING: Using default SECRET_KEY. Set SECRET_KEY env var before deploying to production."
+            )
+        if len(v) < 32:
+            raise ValueError("SECRET_KEY must be at least 32 characters")
+        return v
 
     class Config:
         env_file = ".env"

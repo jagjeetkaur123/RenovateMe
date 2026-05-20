@@ -1,6 +1,7 @@
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, or_
 from app.core.database import get_db
 from app.core.deps import get_current_user, get_current_active_customer
 from app.models.user import User
@@ -32,7 +33,10 @@ async def list_jobs(
     size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
 ):
-    query = select(JobPost)
+    now = datetime.now(timezone.utc)
+    query = select(JobPost).where(
+        or_(JobPost.expires_at == None, JobPost.expires_at > now)
+    )
     if category:
         query = query.where(JobPost.category == category)
     if status:

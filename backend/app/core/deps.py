@@ -15,9 +15,13 @@ async def get_current_user(
 ) -> User:
     token = credentials.credentials
     payload = decode_token(token)
+
+    if not payload or payload.get("type") != "access":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
     user_id: str = payload.get("sub")
 
-    if not user_id or payload.get("type") != "access":
+    if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
     result = await db.execute(select(User).where(User.id == int(user_id)))

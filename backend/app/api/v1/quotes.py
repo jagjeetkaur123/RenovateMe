@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.core.database import get_db
 from app.core.deps import get_current_user, get_current_tradesperson
+from app.core.email import send_quote_received, send_quote_accepted
 from app.models.user import User, UserRole
 from app.models.job import JobPost, JobStatus
 from app.models.quote import Quote, QuoteStatus
@@ -49,6 +50,13 @@ async def submit_quote(
     await db.refresh(quote)
 
     job.status = JobStatus.QUOTED
+
+    # Notify customer
+    customer_result = await db.execute(select(User).where(User.id == job.customer_id))
+    customer = customer_result.scalar_one_or_none()
+    if customer:
+        send_quote_received(customer.email, customer.name, job.title, job.id, payload.price)
+
     return quote
 
 
@@ -100,6 +108,15 @@ async def respond_to_quote(
         )
         for other in other_quotes_result.scalars().all():
             other.status = QuoteStatus.DECLINED
+
+        # Notify tradesperson
+        tp_user_result = await db.execute(
+            select(User).join(TradespersonProfile, TradespersonProfile.user_id == User.id)
+            .where(TradespersonProfile.id == quote.tradesperson_id)
+        )
+        tp_user = tp_user_result.scalar_one_or_none()
+        if tp_user:
+            send_quote_accepted(tp_user.email, tp_user.name, job.title, job.id)
 
     await db.flush()
     await db.refresh(quote)
