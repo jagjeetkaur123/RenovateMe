@@ -55,12 +55,11 @@ async def rate_limit_middleware(request: Request, call_next):
     return await call_next(request)
 
 
-# CORS — only allow known origins
-allowed_origins = [settings.FRONTEND_URL, "http://localhost:3000", "http://localhost:19006"]
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
+    allow_origins=["*"] if settings.ENVIRONMENT == "development" else [settings.FRONTEND_URL],
+    allow_credentials=False,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "Accept"],
 )

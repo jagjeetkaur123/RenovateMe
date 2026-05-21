@@ -42,7 +42,7 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
-      <div className="w-full max-w-xl"> {/* Width thodi badha di cards ke liye */}
+      <div className="w-full max-w-xl">
         <div className="mb-8 text-center">
           <Link href="/" className="text-2xl font-bold text-brand-600">
             SilverBricks Connect
@@ -51,11 +51,9 @@ export default function RegisterPage() {
         </div>
 
         <div className="card space-y-8">
-          {/* --- Professional Role Selection Cards Start --- */}
           <div>
             <p className="label mb-4 text-center">I want to...</p>
             <div className="grid gap-4 sm:grid-cols-2">
-              {/* Card 1: Customer */}
               <button
                 type="button"
                 onClick={() => setRole("customer")}
@@ -70,7 +68,6 @@ export default function RegisterPage() {
                 <div className="mt-1 text-xs text-gray-500">I want to find and book tradies</div>
               </button>
 
-              {/* Card 2: Partner */}
               <button
                 type="button"
                 onClick={() => setRole("tradesperson")} 
@@ -110,7 +107,6 @@ export default function RegisterPage() {
               </div>
             )}
           </div>
-          {/* --- Professional Role Selection Cards End --- */}
 
           <form onSubmit={handleSubmit} className="space-y-4 pt-4 border-t border-gray-100">
             {error && (
@@ -167,7 +163,7 @@ export default function RegisterPage() {
             </div>
 
             <button type="submit" className="btn-primary w-full py-3 mt-4" disabled={loading}>
-              {loading ? "Creating account..." : `Register as ${role.replace('_', ' ')}`}
+              {loading ? "Creating account..." : `Create ${role === "customer" ? "Customer" : role === "tradesperson" ? "Tradesperson" : "Business"} Account`}
             </button>
 
             <p className="text-center text-xs text-gray-500">

@@ -11,31 +11,32 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def register(payload: UserRegister, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.email == payload.email))
-    if result.scalar_one_or_none():
-        raise HTTPException(status_code=400, detail="Email already registered")
+    try:
+        result = await db.execute(select(User).where(User.email == payload.email))
+        if result.scalar_one_or_none():
+            raise HTTPException(status_code=400, detail="Email already registered")
 
-    user = User(
-        name=payload.name,
-        email=payload.email,
-        phone=payload.phone,
-        role=payload.role,
-        hashed_password=hash_password(payload.password),
-    )
-    db.add(user)
-    await db.flush()
-    await db.commit() 
-    await db.refresh(user)
+        user = User(
+            name=payload.name,
+            email=payload.email,
+            phone=payload.phone,
+            role=payload.role.value,
+            hashed_password=hash_password(payload.password),
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
 
-    from app.core.email import send_welcome
-    send_welcome(user.email, user.name)
-
-    return TokenResponse(
-        access_token=create_access_token(user.id),
-        refresh_token=create_refresh_token(user.id),
-        token_type="bearer",
-        user=UserOut.model_validate(user),
-    )
+        return TokenResponse(
+            access_token=create_access_token(user.id),
+            refresh_token=create_refresh_token(user.id),
+            token_type="bearer",
+            user=UserOut.model_validate(user),
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Registration error: {type(e).__name__}: {str(e)}")
 
 @router.post("/login", response_model=TokenResponse)
 async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):

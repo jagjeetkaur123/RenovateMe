@@ -28,18 +28,13 @@ export default function LoginPage() {
       };
       router.push(roleRedirects[data.user.role] ?? "/");
     } catch (err: any) {
-      // --- CHANGE KIYA: Backend message handle karne ke liye ---
       if (err.response?.status === 404) {
-        // Jab user database mein nahi milta
-        setError("User not found! First you will need to signup, please.");
+        setError("No account found with that email. Please sign up first.");
       } else if (err.response?.status === 401) {
-        // Jab password galat hota hai
         setError("Invalid email or password. Please try again.");
       } else {
-        // Koi aur error (Server down etc.)
         setError("Something went wrong. Please try again later.");
       }
-      // -------------------------------------------------------
     } finally {
       setLoading(false);
     }
