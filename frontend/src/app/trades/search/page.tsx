@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
+import NavBar from "@/components/NavBar";
 
 const CATEGORY_LABELS: Record<string, string> = {
   handyman: "General Trades / Handyman",
@@ -64,15 +65,7 @@ export default function TradesSearchPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white px-4 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-brand-600">SilverBricks Connect</Link>
-          <div className="flex gap-3">
-            <Link href="/login" className="btn-ghost text-sm">Log in</Link>
-            <Link href="/register" className="btn-primary text-sm">Sign up</Link>
-          </div>
-        </div>
-      </header>
+      <NavBar />
 
       <main className="mx-auto max-w-7xl px-4 py-10">
         <div className="mb-2 flex items-center gap-2 text-sm text-gray-500">

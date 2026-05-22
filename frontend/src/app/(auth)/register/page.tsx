@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { register } from "@/lib/auth";
 
 type Role = "customer" | "tradesperson" | "business_owner";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const defaultRole = (searchParams.get("role") as Role) ?? "customer";
@@ -70,7 +70,7 @@ export default function RegisterPage() {
 
               <button
                 type="button"
-                onClick={() => setRole("tradesperson")} 
+                onClick={() => setRole("tradesperson")}
                 className={`flex flex-col items-center rounded-xl border-2 p-6 text-center transition ${
                   role !== "customer"
                     ? "border-brand-500 bg-blue-50 ring-2 ring-brand-500/20"
@@ -83,22 +83,21 @@ export default function RegisterPage() {
               </button>
             </div>
 
-            {/* Sub-role selector (Only if Partner is selected) */}
             {role !== "customer" && (
               <div className="mt-6 flex justify-center gap-6 rounded-lg bg-gray-50 p-3">
                 <label className="flex items-center gap-2 text-sm font-medium cursor-pointer text-gray-700">
-                  <input 
-                    type="radio" 
-                    checked={role === "tradesperson"} 
+                  <input
+                    type="radio"
+                    checked={role === "tradesperson"}
                     onChange={() => setRole("tradesperson")}
                     className="h-4 w-4 text-brand-600 focus:ring-brand-500"
                   />
                   Individual Tradie
                 </label>
                 <label className="flex items-center gap-2 text-sm font-medium cursor-pointer text-gray-700">
-                  <input 
-                    type="radio" 
-                    checked={role === "business_owner"} 
+                  <input
+                    type="radio"
+                    checked={role === "business_owner"}
                     onChange={() => setRole("business_owner")}
                     className="h-4 w-4 text-brand-600 focus:ring-brand-500"
                   />
@@ -182,5 +181,13 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }

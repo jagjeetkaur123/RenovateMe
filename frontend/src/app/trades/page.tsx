@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import NavBar from "@/components/NavBar";
 
 const CATEGORIES = [
   { id: "handyman", label: "General Trades / Handyman", icon: "🔧" },
@@ -30,15 +31,7 @@ export default function TradesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white px-4 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-brand-600">SilverBricks Connect</Link>
-          <div className="flex gap-3">
-            <Link href="/login" className="btn-ghost text-sm">Log in</Link>
-            <Link href="/register" className="btn-primary text-sm">Sign up</Link>
-          </div>
-        </div>
-      </header>
+      <NavBar />
 
       <main className="mx-auto max-w-7xl px-4 py-10">
         <h1 className="mb-2 text-3xl font-bold text-gray-900">Find a Tradesperson</h1>
