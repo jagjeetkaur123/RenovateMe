@@ -48,7 +48,9 @@ async function fetchTradespeople(category: string, suburb: string) {
   return data;
 }
 
-export default function TradesSearchPage() {
+import { Suspense } from "react";
+
+function TradesSearchContent() {
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category") ?? "";
   const initialSuburb = searchParams.get("suburb") ?? "";
@@ -172,5 +174,13 @@ export default function TradesSearchPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function TradesSearchPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+      <TradesSearchContent />
+    </Suspense>
   );
 }
